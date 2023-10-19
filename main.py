@@ -23,7 +23,7 @@ try:
     DEPTH = int(input("Depth: "))
 except ValueError:
     DEPTH = "User has disappointed us all"
-while not (isinstance(DEPTH, int) and 0 <= DEPTH <= 2):
+while not (isinstance(DEPTH, int) and 0 <= DEPTH <= 3):
     DEPTH = input("Depth (should be an integer between 0 and 2): ")
     try:
         DEPTH = int(DEPTH)
@@ -126,181 +126,92 @@ def check_won(move):
 
 
 # giant 87 line brute force win check for big mode
-def check_big_win(move, color):
-    big_square = math.floor(move / 9)
+def check_big_win(move, color, multiplier):
+    big_square = math.floor(move / multiplier)
     if search[move][BG] == color:  # NOQA
         # Check horizontal win for left placed last
         # (X) X  X
         # (O) O  O
         # (X) X  X
         if big_square % 3 == 0:
-            if search[move][BG] == search[move + 9][BG] == search[move + (9 * 2)][BG]:  # NOQA
+            if search[move][BG] == search[move + multiplier][BG] == search[move + (multiplier * 2)][BG]:  # NOQA
                 return True
         # Check horizontal win for center placed last
         #  X (X) X
         #  O (O) O
         #  X (X) X
         if big_square % 3 == 1:
-            if search[move - 9][BG] == search[move][BG] == search[move + 9][BG]:  # NOQA
+            if search[move - multiplier][BG] == search[move][BG] == search[move + multiplier][BG]:  # NOQA
                 return True
         # Check horizontal win for right placed last
         #  X  X (X)
         #  O  O (O)
         #  X  X (X)
         if big_square % 3 == 2:
-            if search[move - (9 * 2)][BG] == search[move - 9][BG] == search[move][BG]:  # NOQA
+            if search[move - (multiplier * 2)][BG] == search[move - multiplier][BG] == search[move][BG]:  # NOQA
                 return True
         # Check vertical win for top placed last
         # (X)(O)(X)
         #  X  O  X
         #  X  O  X
         if big_square < 3:
-            if search[move][BG] == search[move + (9 * 3)][BG] == search[move + (9 * 6)][BG]:  # NOQA
+            if search[move][BG] == search[move + (multiplier * 3)][BG] == search[move + (multiplier * 6)][BG]:  # NOQA
                 return True
         # Check vertical win for center placed last
         #  X  O  X
         # (X)(O)(X)
         #  X  O  X
         if 6 > big_square >= 3:
-            if search[move - (9 * 3)][BG] == search[move][BG] == search[move + (9 * 3)][BG]:  # NOQA
+            if search[move - (multiplier * 3)][BG] == search[move][BG] == search[move + (multiplier * 3)][BG]:  # NOQA
                 return True
         # Check vertical win for bottom placed last
         #  X  O  X
         #  X  O  X
         # (X)(O)(X)
         if big_square >= 6:
-            if search[move - (9 * 6)][BG] == search[move - (9 * 3)][BG] == search[move][BG]:  # NOQA
+            if search[move - (multiplier * 6)][BG] == search[move - (multiplier * 3)][BG] == search[move][BG]:  # NOQA
                 return True
         # Check backslash win for upper left placed last
         # (X) -  -
         #  -  X  -
         #  -  -  X
         if big_square == 0:
-            if search[move][BG] == search[move + (9 * 4)][BG] == search[move + (9 * 8)][BG]:  # NOQA
+            if search[move][BG] == search[move + (multiplier * 4)][BG] == search[move + (multiplier * 8)][BG]:  # NOQA
                 return True
         # Check backslash win for center placed last
         #  X  -  -
         #  - (X) -
         #  -  -  X
         if big_square == 4:
-            if search[move - (9 * 4)][BG] == search[move][BG] == search[move + (9 * 4)][BG]:  # NOQA
+            if search[move - (multiplier * 4)][BG] == search[move][BG] == search[move + (multiplier * 4)][BG]:  # NOQA
                 return True
         # Check backslash win for bottom right placed last
         #  X  -  -
         #  -  X  -
         #  -  - (X)
         if big_square == 8:
-            if search[move - (9 * 8)][BG] == search[move - (9 * 4)][BG] == search[move][BG]:  # NOQA
+            if search[move - (multiplier * 8)][BG] == search[move - (multiplier * 4)][BG] == search[move][BG]:  # NOQA
                 return True
         # Check slash win for bottom left placed last
         #  -  -  X
         #  -  X  -
         # (X) -  -
         if big_square == 6:
-            if search[move - (9 * 4)][BG] == search[move - (9 * 2)][BG] == search[move][BG]:  # NOQA
+            if search[move - (multiplier * 4)][BG] == search[move - (multiplier * 2)][BG] == search[move][BG]:  # NOQA
                 return True
         # Check slash win for center placed last
         #  -  -  X
         #  - (X) -
         #  X  -  -
         if big_square == 4:
-            if search[move - (9 * 2)][BG] == search[move][BG] == search[move + (9 * 2)][BG]:  # NOQA
+            if search[move - (multiplier * 2)][BG] == search[move][BG] == search[move + (multiplier * 2)][BG]:  # NOQA
                 return True
         # Check slash win for upper right placed last
         #  -  - (X)
         #  -  X  -
         #  X  -  -
         if big_square == 2:
-            if search[move][BG] == search[move + (9 * 2)][BG] == search[move + (9 * 4)][BG]:  # NOQA
-                return True
-
-
-def check_huge_win(move, color):
-    huge_square = math.floor(move / 81)
-    if search[move][BG] == color:  # NOQA
-        # Check horizontal win for left placed last
-        # (X) X  X
-        # (O) O  O
-        # (X) X  X
-        if huge_square % 3 == 0:
-            if search[move][BG] == search[move + 81][BG] == search[move + (81 * 2)][BG]:  # NOQA
-                return True
-        # Check horizontal win for center placed last
-        #  X (X) X
-        #  O (O) O
-        #  X (X) X
-        if huge_square % 3 == 1:
-            if search[move - 81][BG] == search[move][BG] == search[move + 81][BG]:  # NOQA
-                return True
-        # Check horizontal win for right placed last
-        #  X  X (X)
-        #  O  O (O)
-        #  X  X (X)
-        if huge_square % 3 == 2:
-            if search[move - (81 * 2)][BG] == search[move - 81][BG] == search[move][BG]:  # NOQA
-                return True
-        # Check vertical win for top placed last
-        # (X)(O)(X)
-        #  X  O  X
-        #  X  O  X
-        if huge_square < 3:
-            if search[move][BG] == search[move + (81 * 3)][BG] == search[move + (81 * 6)][BG]:  # NOQA
-                return True
-        # Check vertical win for center placed last
-        #  X  O  X
-        # (X)(O)(X)
-        #  X  O  X
-        if 6 > huge_square >= 3:
-            if search[move - (81 * 3)][BG] == search[move][BG] == search[move + (81 * 3)][BG]:  # NOQA
-                return True
-        # Check vertical win for bottom placed last
-        #  X  O  X
-        #  X  O  X
-        # (X)(O)(X)
-        if huge_square >= 6:
-            if search[move - (81 * 6)][BG] == search[move - (81 * 3)][BG] == search[move][BG]:  # NOQA
-                return True
-        # Check backslash win for upper left placed last
-        # (X) -  -
-        #  -  X  -
-        #  -  -  X
-        if huge_square == 0:
-            if search[move][BG] == search[move + (81 * 4)][BG] == search[move + (81 * 8)][BG]:  # NOQA
-                return True
-        # Check backslash win for center placed last
-        #  X  -  -
-        #  - (X) -
-        #  -  -  X
-        if huge_square == 4:
-            if search[move - (81 * 4)][BG] == search[move][BG] == search[move + (81 * 4)][BG]:  # NOQA
-                return True
-        # Check backslash win for bottom right placed last
-        #  X  -  -
-        #  -  X  -
-        #  -  - (X)
-        if huge_square == 8:
-            if search[move - (81 * 8)][BG] == search[move - (81 * 4)][BG] == search[move][BG]:  # NOQA
-                return True
-        # Check slash win for bottom left placed last
-        #  -  -  X
-        #  -  X  -
-        # (X) -  -
-        if huge_square == 6:
-            if search[move - (81 * 4)][BG] == search[move - (81 * 2)][BG] == search[move][BG]:  # NOQA
-                return True
-        # Check slash win for center placed last
-        #  -  -  X
-        #  - (X) -
-        #  X  -  -
-        if huge_square == 4:
-            if search[move - (81 * 2)][BG] == search[move][BG] == search[move + (81 * 2)][BG]:  # NOQA
-                return True
-        # Check slash win for upper right placed last
-        #  -  - (X)
-        #  -  X  -
-        #  X  -  -
-        if huge_square == 2:
-            if search[move][BG] == search[move + (81 * 2)][BG] == search[move + (81 * 4)][BG]:  # NOQA
+            if search[move][BG] == search[move + (multiplier * 2)][BG] == search[move + (multiplier * 4)][BG]:  # NOQA
                 return True
 
 
@@ -318,16 +229,15 @@ def clicked(button):
                 i.configure(bg=BigX if player else BigO)
             if DEPTH == 0:
                 game_over("You won against a bot playing random moves! Wasn't that easy?")
-            else:
-                if check_big_win(search.index(button), BigX if player else BigO):
-                    idx = search.index(button)
-                    for i in search[(idx - (idx % 81)):(idx - (idx % 81) + 81)]:
-                        i.configure(bg=HugeX if player else HugeO)
-                    if DEPTH == 1:
-                        game_over(f"{X_SIGN} wins!" if player else f"{O_SIGN} wins!")
-                    else:
-                        if check_huge_win(search.index(button), HugeX if player else HugeO) and DEPTH == 2:
-                            game_over(f"{X_SIGN} wins the huge game!" if player else f"{O_SIGN} wins the huge game!")
+        if check_big_win(search.index(button), BigX if player else BigO, 9):
+            idx = search.index(button)
+            for i in search[(idx - (idx % 81)):(idx - (idx % 81) + 81)]:
+                i.configure(bg=HugeX if player else HugeO)
+            if DEPTH == 1:
+                game_over(f"{X_SIGN} wins!" if player else f"{O_SIGN} wins!")
+        if check_big_win(search.index(button), HugeX if player else HugeO, (9 * 9)):
+            if DEPTH == 2:
+                game_over(f"{X_SIGN} wins the huge game!" if player else f"{O_SIGN} wins the huge game!")
         if multiplayer.get():
             bots_move = search.index(button)
             player = not player
@@ -394,16 +304,14 @@ def bot_move(last_move):
             i.configure(bg=BigO if player else BigX)
         if DEPTH == 0:
             game_over("The computer wins against a disappointment playing random moves! Wasn't that easy?")
-        else:
-            if check_big_win(search.index(bot_button), BigO if player else BigX):
-                idx = search.index(bot_button)
-                for i in search[(idx - (idx % 81)):(idx - (idx % 81) + 81)]:
-                    i.configure(bg=HugeO if player else HugeX)
-                if DEPTH == 1:
-                    game_over("Computer wins!")
-                else:
-                    if check_huge_win(search.index(bot_button), HugeO if player else HugeX) and DEPTH == 2:
-                        game_over("Computer wins hugely! How did you mess up that badly?!")
+    if check_big_win(search.index(bot_button), BigO if player else BigX, 9):
+        idx = search.index(bot_button)
+        for i in search[(idx - (idx % (9*9))):(idx - (idx % (9*9)) + (9*9))]:
+            i.configure(bg=HugeO if player else HugeX)
+        if DEPTH == 1:
+            game_over("Computer wins!")
+    if check_big_win(search.index(bot_button), HugeO if player else HugeX, (9 * 9)) and DEPTH == 2:
+        game_over("Computer wins hugely! How did you mess up that badly?!")
     green = 0
     look_for_children(root, True, 0)
     if green == 0:
