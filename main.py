@@ -462,7 +462,7 @@ if __name__ == "__main__":
     x_pos = root.winfo_screenwidth() // 2 - width // 2 - white_bar_thickness // 2
     y_pos = root.winfo_screenheight() // 2 - height // 2 - white_bar_thickness // 2
     spacer = tk.Label(root, text="I am useless.")
-    # reset_geometry(spacer)
+    reset_geometry(spacer)
     root.protocol("WM_DELETE_WINDOW", lambda: are_you_sure())
     multiplayer = tk.BooleanVar(root, False)
     multiplayer_checkbox = tk.Checkbutton(root, text="Multiplayer Mode", variable=multiplayer, bg="light gray",
