@@ -16,6 +16,8 @@ BigO = "yellow"
 BigX = "dark blue"
 HugeO = "light green"
 HugeX = "purple"
+GiantO = "aqua"
+GiantX = "dark purple"
 BG = 'bg'
 TEXT = 'text'
 player = True
@@ -23,7 +25,7 @@ try:
     DEPTH = int(input("Depth: "))
 except ValueError:
     DEPTH = "User has disappointed us all"
-while not (isinstance(DEPTH, int) and 0 <= DEPTH <= 3):
+while not (isinstance(DEPTH, int) and 0 <= DEPTH <= 2):
     DEPTH = input("Depth (should be an integer between 0 and 2): ")
     try:
         DEPTH = int(DEPTH)
@@ -236,8 +238,14 @@ def clicked(button):
             if DEPTH == 1:
                 game_over(f"{X_SIGN} wins!" if player else f"{O_SIGN} wins!")
         if check_big_win(search.index(button), HugeX if player else HugeO, (9 * 9)):
+            idx = search.index(button)
+            for i in search[(idx - (idx % (9 * 9 * 9))):(idx - (idx % (9 * 9 * 9)) + (9 * 9 * 9))]:
+                i.configure(bg=GiantO if player else GiantX)
             if DEPTH == 2:
                 game_over(f"{X_SIGN} wins the huge game!" if player else f"{O_SIGN} wins the huge game!")
+        if check_big_win(search.index(button), GiantO if player else GiantX, (9 * 9 * 9)):
+            if DEPTH == 3:
+                game_over("Crazy to win this far into the game.")
         if multiplayer.get():
             bots_move = search.index(button)
             player = not player
@@ -306,12 +314,19 @@ def bot_move(last_move):
             game_over("The computer wins against a disappointment playing random moves! Wasn't that easy?")
     if check_big_win(search.index(bot_button), BigO if player else BigX, 9):
         idx = search.index(bot_button)
-        for i in search[(idx - (idx % (9*9))):(idx - (idx % (9*9)) + (9*9))]:
+        for i in search[(idx - (idx % (9 * 9))):(idx - (idx % (9 * 9)) + (9 * 9))]:
             i.configure(bg=HugeO if player else HugeX)
         if DEPTH == 1:
             game_over("Computer wins!")
-    if check_big_win(search.index(bot_button), HugeO if player else HugeX, (9 * 9)) and DEPTH == 2:
-        game_over("Computer wins hugely! How did you mess up that badly?!")
+    if check_big_win(search.index(bot_button), HugeO if player else HugeX, (9 * 9)):
+        idx = search.index(bot_button)
+        for i in search[(idx - (idx % (9 * 9 * 9))):(idx - (idx % (9 * 9 * 9)) + (9 * 9 * 9))]:
+            i.configure(bg=GiantO if player else GiantX)
+        if DEPTH == 2:
+            game_over("Computer wins hugely! How did you mess up that badly?!")
+    if check_big_win(search.index(bot_button), GiantO if player else GiantX, (9 * 9 * 9)):
+        if DEPTH == 3:
+            game_over("Crazy to lose this far into the game.")
     green = 0
     look_for_children(root, True, 0)
     if green == 0:
@@ -371,24 +386,21 @@ class Board:
         self.frame = tk.Frame(master)
         self.create_item_grid(DEPTH, root)
 
-    def create_frame(self, depth):
-        frame = tk.Frame(root,
+    def create_frame(self, depth, parent):
+        global pixel_virtual
+        frame = tk.Frame(parent,
                          highlightbackground="black",
-                         highlightthickness=7) if DEPTH == 0 else tk.Frame(root,
-                                                                           highlightbackground="black",
-                                                                           highlightthickness=3)
+                         highlightthickness=7 if DEPTH == 0 else 5 if DEPTH < 3 else 1)
         if depth > 0:
             self.create_item_grid(depth - 1, frame)
         else:
             button = tk.Button(frame,
                                text=STANDARD_EMPTY,
                                bg=PLAYABLE,
-                               height=5,
-                               width=5) if DEPTH == 0 else tk.Button(frame,
-                                                                     text=STANDARD_EMPTY,
-                                                                     bg=PLAYABLE,
-                                                                     height=1,
-                                                                     width=1)
+                               image=pixel_virtual,
+                               height=100 if DEPTH == 0 else 50 if DEPTH == 1 else 15,
+                               width=100 if DEPTH == 0 else 50 if DEPTH == 1 else 15,
+                               compound="center")
             button.configure(command=lambda: clicked(button))
             button.pack()
         return frame
@@ -396,8 +408,8 @@ class Board:
     def create_item_grid(self, depth, parent):
         for i in range(3):
             for j in range(3):
-                item = self.create_frame(depth)
-                item.grid(row=i + 1, column=j, in_=parent)
+                item = self.create_frame(depth, parent)
+                item.grid(row=i + 1, column=j)
 
     def iterate_nested_list(self, nested_list):
         sub_items = []
@@ -430,6 +442,7 @@ def are_you_sure():
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-topmost', True)
+    pixel_virtual = tk.PhotoImage(width=1, height=1)
     board = Board(root)
     root.configure(bg="black")
     root.title("BigTacToe by MoCoXIII")
@@ -445,10 +458,13 @@ if __name__ == "__main__":
     if DEPTH == 2:
         width = 693
         height = 961
+    if DEPTH == 3:
+        width = 0
+        height = 0
     x_pos = root.winfo_screenwidth() // 2 - width // 2 - white_bar_thickness // 2
     y_pos = root.winfo_screenheight() // 2 - height // 2 - white_bar_thickness // 2
     spacer = tk.Label(root, text="I am useless.")
-    reset_geometry(spacer)
+    # reset_geometry(spacer)
     root.protocol("WM_DELETE_WINDOW", lambda: are_you_sure())
     multiplayer = tk.BooleanVar(root, False)
     multiplayer_checkbox = tk.Checkbutton(root, text="Multiplayer Mode", variable=multiplayer, bg="light gray",

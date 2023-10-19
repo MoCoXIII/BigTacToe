@@ -1,15 +1,22 @@
-import random
+import tkinter as tk
 
-good_moves = []
 
-for i in range(9):
-    suggested_move = random.choice([j for j in range(1, 9)])
-    while bool(input(f"Is {suggested_move} a good move (True/False)? ")) is False and suggested_move in good_moves:
-        suggested_move = random.choice([j for j in range(1, 9)])
-    good_moves.append(suggested_move)
-    user_move = int(input("Your move: "))
-    while user_move in good_moves:
-        user_move = int(input(f"Your move ({user_move} is not available): "))
-    good_moves.append(user_move)
+def clicked(button):
+    print("Button clicked!")
 
-print(good_moves)
+
+DEPTH = 0
+root = tk.Tk()
+
+pixel_virtual = tk.PhotoImage(width=1, height=1)
+button = tk.Button(root,
+                   text="-",
+                   bg="green",
+                   image=pixel_virtual,
+                   height=50 if DEPTH == 0 else 10,
+                   width=50 if DEPTH == 0 else 10,
+                   compound="center")
+button.configure(command=lambda: clicked(button))
+button.pack()
+
+root.mainloop()
