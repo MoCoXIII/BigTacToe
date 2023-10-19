@@ -219,6 +219,7 @@ def check_big_win(move, color, multiplier):
 
 def clicked(button):
     global search, player, bots_move, green
+    print(root.winfo_geometry())
     # Check if the button is proper
     if button['text'] == STANDARD_EMPTY and button['bg'] == PLAYABLE:
         search = []
@@ -450,17 +451,14 @@ if __name__ == "__main__":
     height = 0
     white_bar_thickness = 30
     if DEPTH == 0:
-        width = 177
-        height = 325
+        width = 366
+        height = 391
     if DEPTH == 1:
-        width = 225
-        height = 331
+        width = 642
+        height = 667
     if DEPTH == 2:
-        width = 693
-        height = 961
-    if DEPTH == 3:
-        width = 0
-        height = 0
+        width = 1011
+        height = 1036
     x_pos = root.winfo_screenwidth() // 2 - width // 2 - white_bar_thickness // 2
     y_pos = root.winfo_screenheight() // 2 - height // 2 - white_bar_thickness // 2
     spacer = tk.Label(root, text="I am useless.")
